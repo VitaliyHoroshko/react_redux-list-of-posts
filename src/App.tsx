@@ -1,8 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { fetchUsers, setUser } from './components/UsersSlice';
-import { fetchPosts, setPost } from './components/postsSlice';
+import { fetchUsers } from './components/UsersSlice';
+import { fetchPosts } from './components/postsSlice';
+import { setAuthor } from './components/authorSlice';
+import { setSelectedPostAction } from './components/selectedPostSlice';
 import classNames from 'classnames';
 
 import 'bulma/css/bulma.css';
@@ -17,13 +19,12 @@ import { Loader } from './components/Loader';
 export const App: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  const { selectedUser: author } = useAppSelector(state => state.users);
-
+  const author = useAppSelector(state => state.author);
+  const selectedPost = useAppSelector(state => state.selectedPost);
   const {
     items: posts,
     loaded,
     hasError,
-    selectedPost,
   } = useAppSelector(state => state.posts);
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export const App: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(setPost(null));
+    dispatch(setSelectedPostAction(null));
 
     if (author) {
       dispatch(fetchPosts(author.id));
@@ -47,7 +48,7 @@ export const App: React.FC = () => {
               <div className="block">
                 <UserSelector
                   value={author}
-                  onChange={user => dispatch(setUser(user))}
+                  onChange={user => dispatch(setAuthor(user))}
                 />
               </div>
 
@@ -75,7 +76,9 @@ export const App: React.FC = () => {
                   <PostsList
                     posts={posts}
                     selectedPostId={selectedPost?.id}
-                    onPostSelected={post => dispatch(setPost(post))}
+                    onPostSelected={post =>
+                      dispatch(setSelectedPostAction(post))
+                    }
                   />
                 )}
               </div>
